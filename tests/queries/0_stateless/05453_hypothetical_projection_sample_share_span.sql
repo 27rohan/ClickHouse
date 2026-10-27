@@ -1,4 +1,4 @@
--- the sampled granules are read exactly, so the sampling error covers only the granules out of the sample
+-- the scan reads the sampled granules exactly, so the sampling error covers only the granules out of the sample
 -- with half the granules in the sample the span is narrower than for a sample of a small share
 -- the twin table has the projection materialized and shows the read that the optimizer selects
 
