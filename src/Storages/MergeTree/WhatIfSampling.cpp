@@ -29,6 +29,11 @@ std::vector<size_t> sampleUnits(size_t units, size_t step, const String & part_n
     return sampled;
 }
 
+double finitePopulationCorrection(double units_read, double units)
+{
+    return units > 0 ? std::sqrt(std::max(0.0, 1.0 - units_read / units)) : 1.0;
+}
+
 double standardErrorOfSample(const std::vector<double> & values, const std::vector<double> & weights)
 {
     auto weight = [&](size_t i) { return weights.empty() ? 1.0 : weights[i]; };

@@ -456,9 +456,8 @@ bool tryEstimateEmpirical(
         /// has fewer marks than 3 heaviest draws, with a 95% chance. Light draws find less, so they do not make this error smaller
         const double sample_error = window_survives.size() > 1 ? standardErrorOfSample(window_survives, window_weights) : 0;
         const double least_error = 1.5 * heaviest_draw / std::max(weighted_marks, 1.0);
-        /// the read windows are exact, so the error of the share applies to the baseline marks out of the sample only
-        const double unread_marks = static_cast<double>(baseline_marks - total_data_granules);
-        spread += 2.0 * std::max(sample_error, least_error) * std::sqrt(unread_marks * static_cast<double>(baseline_marks));
+        spread += 2.0 * std::max(sample_error, least_error) * static_cast<double>(baseline_marks)
+            * finitePopulationCorrection(static_cast<double>(total_data_granules), static_cast<double>(baseline_marks));
     }
 
     /// the sampled windows are exact, so they bound the estimate and the span

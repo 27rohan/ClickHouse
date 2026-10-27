@@ -698,6 +698,7 @@ void widenForSamples(
     /// that gap is a sampling step if the key follows the parent order
     std::vector<double> granule_shares;
     UInt64 layout_marks = 0;
+    size_t parent_marks = 0;
     double range_end_spread = 0;
     for (const auto & sampled : samples)
     {
@@ -710,6 +711,7 @@ void widenForSamples(
 
         /// the sampled granule each sample row came from, and the rows of each
         const auto & parent_granularity = *sampled.parent->index_granularity;
+        parent_marks += parent_granularity.getMarksCountWithoutFinal();
         std::vector<size_t> sampled_granule_rows;
         std::vector<UInt32> granule_of_row;
         granule_of_row.reserve(sample.rows);
@@ -752,7 +754,11 @@ void widenForSamples(
 
     /// widen by two standard errors of the selected share (successive differences, fits a systematic sample)
     if (granule_shares.size() > 1)
-        widen(marks_low, marks_high, 2.0 * standardErrorOfSample(granule_shares) * static_cast<double>(layout_marks));
+        widen(
+            marks_low,
+            marks_high,
+            2.0 * standardErrorOfSample(granule_shares) * static_cast<double>(layout_marks)
+                * finitePopulationCorrection(static_cast<double>(granule_shares.size()), static_cast<double>(parent_marks)));
 
 }
 
