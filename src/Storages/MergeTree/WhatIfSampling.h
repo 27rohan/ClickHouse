@@ -26,4 +26,7 @@ size_t sampledRunLength(size_t units, size_t step, size_t i);
 /// with `weights` (one for each value) the mean is weighted, and the differences are of weight x (value - mean)
 double standardErrorOfSample(const std::vector<double> & values, const std::vector<double> & weights = {});
 
+/// the units in the sample are read exactly, so the sampling error shrinks by sqrt(1 - read share) (finite-population correction)
+double finitePopulationCorrection(double units_read, double units);
+
 }

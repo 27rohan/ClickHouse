@@ -744,6 +744,7 @@ void widenForSamples(
     std::vector<double> granule_shares;
     std::vector<double> granule_weights;
     UInt64 layout_marks = 0;
+    size_t parent_marks = 0;
     double range_end_spread = 0;
     for (const auto & sampled : samples)
     {
@@ -756,6 +757,7 @@ void widenForSamples(
 
         /// the rows of each sampled granule
         const auto & parent_granularity = *sampled.parent->index_granularity;
+        parent_marks += parent_granularity.getMarksCountWithoutFinal();
         const auto & granule_of_row = sample.granule_of_row;
         std::vector<size_t> sampled_granule_rows;
         for (const auto & range : sampled.ranges_read)
@@ -794,7 +796,11 @@ void widenForSamples(
 
     /// widen by two standard errors of the selected share (successive differences, fits a systematic sample)
     if (granule_shares.size() > 1)
-        widen(marks_low, marks_high, 2.0 * standardErrorOfSample(granule_shares, granule_weights) * static_cast<double>(layout_marks));
+        widen(
+            marks_low,
+            marks_high,
+            2.0 * standardErrorOfSample(granule_shares, granule_weights) * static_cast<double>(layout_marks)
+                * finitePopulationCorrection(static_cast<double>(granule_shares.size()), static_cast<double>(parent_marks)));
 
 }
 
